@@ -4,6 +4,8 @@
  */
 package buoi1;
 
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Huyen
@@ -107,11 +109,28 @@ public class FormDangNhap extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        String username= txtUsername.getText();//lấy text nhập trong ô username
+        //sau khi bấm nút Login => hỏi có chắc chắn hay ko
+        //=> confirm dialog
+        String username = txtUsername.getText();//lấy text nhập trong ô username
         String password = String.valueOf(txtPassword.getPassword());
         //txtPassword.getPassword(): trả về 1 mảng ký tự: char[]
-        System.out.println("Username: "+ username);
-        System.out.println("Password: "+ password);
+
+        if (username.equalsIgnoreCase("huyennk6") 
+                && password.equalsIgnoreCase("h123")) {
+            //isSelected(): kiểm tra checkbox có đc tích chọn ko
+            //trả về kết quả: true/ false
+            if (chkRemember.isSelected()) {
+                System.out.println("Đã lưu thông tin đăng nhập:");
+                System.out.println("Username: " + username);
+                System.out.println("Password: " + password);
+            }
+            JOptionPane.showMessageDialog(this, "Đăng nhập thành công",
+                    "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Đăng nhập thất bại",
+                    "Thông báo", JOptionPane.ERROR_MESSAGE);
+        }
+
     }//GEN-LAST:event_btnLoginActionPerformed
 
     /**
