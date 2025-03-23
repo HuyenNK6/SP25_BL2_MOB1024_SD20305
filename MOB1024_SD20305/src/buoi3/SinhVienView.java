@@ -18,32 +18,54 @@ public class SinhVienView extends javax.swing.JFrame {
      */
     ArrayList<SinhVien> list = new ArrayList<>();
     SinhVienService service = new SinhVienService();
-    DefaultTableModel defaultTableModel= new DefaultTableModel();
-   
+    DefaultTableModel defaultTableModel = new DefaultTableModel();
+
     public SinhVienView() {
         initComponents();
         list = service.getAll(); //lấy dsach từ service sang
         loadDataTable();//gọi load data lên table
-        fillData(list.size()-1);//fill phần tử cuối cùng lên form
+        fillData(list.size() - 1);//fill phần tử cuối cùng lên form
         //trừ 1 vì: vị trí bắt đầu từ 0
+
     }
-    private void loadDataTable(){
+
+    private void loadDataTable() {
         defaultTableModel = (DefaultTableModel) tblSinhVien.getModel();
         defaultTableModel.setRowCount(0);//set số dòng = 0
         //for each => fore + tab
         for (SinhVien sinhVien : list) {
             defaultTableModel.addRow(new Object[]{
-                sinhVien.getMaSV(),sinhVien.getTen(), sinhVien.getTuoi(),
+                sinhVien.getMaSV(), sinhVien.getTen(), sinhVien.getTuoi(),
                 sinhVien.isGioiTinh(), sinhVien.getDiaChi()});
         }
     }
-    private void fillData(int index){
-        SinhVien sv= list.get(index);//lấy ra đối tượng tại vị trí index
+
+    private void fillData(int index) {
+        SinhVien sv = list.get(index);//lấy ra đối tượng tại vị trí index
         txtMaSV.setText(sv.getMaSV());
         txtTen.setText(sv.getTen());
         txtTuoi.setText(String.valueOf(sv.getTuoi()));
-        //giới tính => tự làm nhé ahihi
+        //về nhà làm giới tính
+        if (sv.isGioiTinh()) {//nếu giới tính là true -> sẽ chọn rdoNam
+            rdoNam.setSelected(true);//set được chọn true
+        } else {//nếu giới tính là false
+            rdoNu.setSelected(true);
+        }
         txtDiaChi.setText(sv.getDiaChi());
+    }
+    //MỚI UPDATE 23/03 => chú ý xem lại
+    //trả về 1 đối tượng SV lấy thông tin từ trên form
+    private SinhVien getValueForm() {
+        //txtMaSV.getText() => String
+        //giới tính là boolean: true/false
+        //rdoNam.isSelected(): trả về true nếu rdoNam được chọn, 
+        //nếu ko thì trả về false
+        return new SinhVien(
+                txtMaSV.getText(),
+                txtTen.getText(),
+                Integer.parseInt(txtTuoi.getText()),
+                txtDiaChi.getText(), 
+                rdoNam.isSelected());
     }
 
     /**
@@ -192,6 +214,11 @@ public class SinhVienView extends javax.swing.JFrame {
         );
 
         btnThem.setText("Thêm");
+        btnThem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnThemActionPerformed(evt);
+            }
+        });
 
         btnSua.setText("Sửa");
 
@@ -285,10 +312,19 @@ public class SinhVienView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void tblSinhVienMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblSinhVienMouseClicked
-      //Click chuột phải vào Table => Event => Mouse => mouseClicked
-      int index = tblSinhVien.getSelectedRow();//lấy vị trí dòng dc chọn
-      fillData(index);
+        //Click chuột phải vào Table => Event => Mouse => mouseClicked
+        int index = tblSinhVien.getSelectedRow();//lấy vị trí dòng dc chọn
+        fillData(index); //fill dữ liệu lên form là xong :D
     }//GEN-LAST:event_tblSinhVienMouseClicked
+
+    private void btnThemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemActionPerformed
+        //cần có đối tượng để thêm => lấy từ form infomation
+        SinhVien svNew = getValueForm();
+        //gọi add() trong service để thêm đối tượng
+        service.add(svNew);
+        //load lại table sau khi thêm
+        loadDataTable();
+    }//GEN-LAST:event_btnThemActionPerformed
 
     /**
      * @param args the command line arguments

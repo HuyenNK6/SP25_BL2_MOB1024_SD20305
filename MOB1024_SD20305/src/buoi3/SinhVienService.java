@@ -27,4 +27,9 @@ public class SinhVienService {
     public ArrayList<SinhVien> getAll(){
         return lstSinhViens;
     }
+    //tham số là 1 đối tượng SV
+    //thêm 1 đối tượng sv vào danh sách SV //=> kết nối csdl thì sẽ khác chút
+    public void add(SinhVien sv){
+        lstSinhViens.add(sv);//thêm đối tượng SV được truyền từ tham số vào DS
+    }
 }
