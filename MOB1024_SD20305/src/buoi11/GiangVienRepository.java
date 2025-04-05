@@ -18,7 +18,7 @@ public class GiangVienRepository {
     public GiangVienRepository() {
         con = DBConnect.getConnection();
     }
-
+//Trả về 1 danh sách GV
     public ArrayList<GiangVien> getAll() {
         ArrayList<GiangVien> lstGVs = new ArrayList<>();
         //lấy dữ liệu từ sql
@@ -62,6 +62,83 @@ public class GiangVienRepository {
         }
         return lstGVs;
     }
+    //Tìm kiếm Gv theo mã => trả về 1 đối tượng
+    public GiangVien getOne(String ma) {
+        String sql = """
+                     SELECT [ma]
+                           ,[ten]
+                           ,[loai]
+                           ,[tuoi]
+                           ,[bac]
+                           ,[gioi_tinh]
+                       FROM [dbo].[giang_vien]
+                       WHERE ma like ?
+                     """;
+        try {
+            PreparedStatement ps= con.prepareStatement(sql);
+            //set cái dấu ?
+            ps.setObject(1, ma);//cho dấu ? số 1
+            ResultSet rs = ps.executeQuery();
+            //rs.next(): kiểm tra xem còn dòng dữ liệu ko
+            while (rs.next()) {               
+                //1. khởi tạo đối tượng GV mới
+                GiangVien gv= new GiangVien();
+                //2. lấy dữ liệu từ bảng gán vào đối tượng GV
+                gv.setMa(rs.getString(1));
+                gv.setTen(rs.getString(2));
+                gv.setLoai(rs.getString(3));
+                gv.setTuoi(rs.getInt(4));
+                gv.setBac(rs.getInt(5));
+                gv.setGioi_tinh(rs.getInt(6));
+                //3. trả về 1 đối tượng 
+                return gv;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();//in thông tin về lỗi
+        }
+        return null;
+    }
+    
+    //Thêm 1 đối tượng vào bảng => INSERT
+    /* 
+    INSERT -> THÊM
+    UPDATE -> SỬA
+    DELETE -> XÓA
+    => trả về số dòng được thực hiện => executeUpdate
+    */
+    public boolean addGV(GiangVien gv){
+        //gõ 3 lần dấu nháy kép
+        String sql = """
+                     INSERT INTO [dbo].[giang_vien]
+                                ([ma]
+                                ,[ten]
+                                ,[loai]
+                                ,[tuoi]
+                                ,[bac]
+                                ,[gioi_tinh])
+                          VALUES
+                                (?,?,?,?,?,?)
+                     """;
+        //try + ctrl + space
+        int check=0;
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            //set dấu ?
+            ps.setObject(1, gv.getMa());
+            ps.setObject(2, gv.getTen());
+            ps.setObject(3, gv.getLoai());
+            ps.setObject(4, gv.getTuoi());
+            ps.setObject(5, gv.getBac());
+            ps.setObject(6, gv.getGioi_tinh());
+            
+            check = ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return check > 0;
+        // check = 1 -> 1>0 return true
+        // check = 0 -> 0>0 return false
+    }
     //main tab
     public static void main(String[] args) {
         GiangVienRepository repo= new GiangVienRepository();
@@ -69,5 +146,13 @@ public class GiangVienRepository {
         for (GiangVien gv : list) {
             gv.inThongTin();
         }
+        GiangVien gvTimKiem = repo.getOne("PhongTT35");//tìm GV theo mã
+        System.out.println("Tìm kiếm giảng viên: ");
+        gvTimKiem.inThongTin();
+        //test 1 lần phần dưới này
+        GiangVien gvNew = new GiangVien("Huyen566", "Khanh Huyen",
+                                "Loai 1", 18, 3, 1);
+        boolean test = repo.addGV(gvNew);
+        System.out.println("Thêm GV mới: "+ test); 
     }
 }
